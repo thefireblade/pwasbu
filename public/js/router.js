@@ -1,7 +1,9 @@
+//This is a comment. I AM CHANGING IT
 class Router {
 
-  constructor(routes) {
-    this.routes = routes;
+  constructor(routesObj) {
+    this.routesObj = routesObj;
+    this.routes = routesObj.routes;
     this._loadInitialRoute();
   }
 
@@ -14,7 +16,10 @@ class Router {
     // We pass an empty object and an empty string as the historyState and title arguments, but their values do not really matter here.
     const url = `/#${urlSegments.join('/')}`;
    history.pushState({}, '', url);
-
+    window.onhashchange = ()=> {
+      this.routesObj.template.load(location.hash.split('#')[1]);
+    };
+    // this.routesObj.template.load(url);
     // Append the given template to the DOM inside the router outlet.
     const routerOutletElement = document.querySelectorAll('[data-router-outlet]')[0];
     // routerOutletElement.innerHTML = matchedRoute.getTemplate(matchedRoute.params);
@@ -26,6 +31,26 @@ class Router {
      });
   }
 
+  loadNavRoute(...urlSegments) {
+
+    // Get the template for the given route.
+    const matchedRoute = this._matchUrlToRoute(urlSegments);
+
+    // Push a history entry with the new url.
+    // We pass an empty object and an empty string as the historyState and title arguments, but their values do not really matter here.
+    // const url = `/#${urlSegments.join('/')}`;
+  //  history.pushState({}, '', url);
+
+    // Append the given template to the DOM inside the router outlet.
+    const routerOutletElement = document.querySelectorAll('[data-router-header]')[0];
+    // routerOutletElement.innerHTML = matchedRoute.getTemplate(matchedRoute.params);
+     matchedRoute.getTemplate(matchedRoute.params).then((page)=>{
+
+     routerOutletElement.innerHTML='';
+       routerOutletElement.appendChild(page.content.querySelectorAll('div')[0]);
+
+     });
+  }
   _matchUrlToRoute(urlSegments) {
     // Try and match the URL to a route.
     const routeParams = {};
